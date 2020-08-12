@@ -1,0 +1,38 @@
+[package]
+name = "bevy_sdl2"
+version = "0.1.0"
+authors = ["Philip Degarmo <aclysma@gmail.com>"]
+edition = "2018"
+description = "An SDL2 window and input backend for Bevy Engine"
+license = "MIT"
+keywords = ["bevy"]
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+# bevy
+bevy_app = { git = "https://github.com/bevyengine/bevy.git", version = "0.1" }
+bevy_ecs = { git = "https://github.com/bevyengine/bevy.git", version = "0.1" }
+bevy_input = { git = "https://github.com/bevyengine/bevy.git", version = "0.1" }
+bevy_math = { git = "https://github.com/bevyengine/bevy.git", version = "0.1" }
+bevy_window = { git = "https://github.com/bevyengine/bevy.git", version = "0.1" }
+
+# other
+sdl2 = { version = "0.34", features = ["raw-window-handle"] }
+raw-window-handle = "0.3"
+log = { version = "0.4", features = ["release_max_level_info"] }
+
+[dev-dependencies]
+bevy = { git = "https://github.com/bevyengine/bevy.git", version = "0.1", default-features = false, features = ["bevy_wgpu"] }
+
+[patch."https://github.com/bevyengine/bevy"]
+bevy = { path = "../bevy" }
+bevy_app = { path = "../bevy/crates/bevy_app" }
+bevy_ecs = { path = "../bevy/crates/bevy_ecs" }
+bevy_input = { path = "../bevy/crates/bevy_input" }
+bevy_math = { path = "../bevy/crates/bevy_math" }
+bevy_window = { path = "../bevy/crates/bevy_window" }
+
+[patch.crates-io]
+gfx-backend-metal = { path = "../gfx/src/backend/metal" }
+gfx-hal = { path = "../gfx/src/hal" }
