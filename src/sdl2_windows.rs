@@ -1,6 +1,6 @@
-use bevy_window::{Window, WindowId, CreateWindow, BevyRawWindowHandle};
-use std::collections::HashMap;
+use bevy_window::{BevyRawWindowHandle, CreateWindow, Window, WindowId};
 use raw_window_handle::HasRawWindowHandle;
+use std::collections::HashMap;
 
 #[derive(Default)]
 pub struct Sdl2Windows {
@@ -16,12 +16,15 @@ impl Sdl2Windows {
         window_event: &CreateWindow,
     ) -> Window {
         let sdl2_window = sdl2_video_subsystem
-            .window(&window_event.descriptor.title, window_event.descriptor.width, window_event.descriptor.height)
+            .window(
+                &window_event.descriptor.title,
+                window_event.descriptor.width,
+                window_event.descriptor.height,
+            )
             .position_centered()
             .resizable()
             .build()
             .expect("Failed to create window");
-
 
         let raw_window_handle = BevyRawWindowHandle(sdl2_window.raw_window_handle());
 
@@ -30,20 +33,22 @@ impl Sdl2Windows {
         self.bevy_id_to_sdl2_id.insert(window_event.id, sdl2_id);
         self.sdl2_id_to_bevy_id.insert(sdl2_id, window_event.id);
 
-        Window::new(
-            window_event.id,
-            raw_window_handle,
-            &window_event.descriptor
-        )
+        Window::new(window_event.id, raw_window_handle, &window_event.descriptor)
     }
 
-    pub fn get_window(&self, id: WindowId) -> Option<&sdl2::video::Window> {
+    pub fn get_window(
+        &self,
+        id: WindowId,
+    ) -> Option<&sdl2::video::Window> {
         self.bevy_id_to_sdl2_id
             .get(&id)
             .and_then(|id| self.windows.get(id))
     }
 
-    pub fn get_window_id(&self, id: u32) -> Option<WindowId> {
+    pub fn get_window_id(
+        &self,
+        id: u32,
+    ) -> Option<WindowId> {
         self.sdl2_id_to_bevy_id.get(&id).map(|x| *x)
     }
 }

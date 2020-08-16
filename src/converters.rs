@@ -6,7 +6,7 @@ use bevy_input::{
 pub fn convert_keyboard_input(
     keycode: sdl2::keyboard::Keycode,
     scancode: sdl2::keyboard::Scancode,
-    element_state: ElementState
+    element_state: ElementState,
 ) -> KeyboardInput {
     KeyboardInput {
         scan_code: scancode as u32,
@@ -22,7 +22,7 @@ pub fn convert_mouse_button(mouse_button: sdl2::mouse::MouseButton) -> MouseButt
         sdl2::mouse::MouseButton::Middle => MouseButton::Middle,
         sdl2::mouse::MouseButton::X1 => MouseButton::Other(0),
         sdl2::mouse::MouseButton::X2 => MouseButton::Other(1),
-        sdl2::mouse::MouseButton::Unknown => MouseButton::Other(2)
+        sdl2::mouse::MouseButton::Unknown => MouseButton::Other(2),
     }
 }
 
@@ -190,6 +190,6 @@ pub fn convert_virtual_key_code(keycode: sdl2::keyboard::Keycode) -> Option<KeyC
         sdl2::keyboard::Keycode::Copy => Some(KeyCode::Copy),
         sdl2::keyboard::Keycode::Paste => Some(KeyCode::Paste),
         sdl2::keyboard::Keycode::Cut => Some(KeyCode::Cut),
-        _ => None
+        _ => None,
     }
 }

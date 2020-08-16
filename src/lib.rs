@@ -1,12 +1,14 @@
 mod converters;
+use crate::sdl2_windows::Sdl2Windows;
 use bevy_app::prelude::*;
-use bevy_window::{CreateWindow, Windows, WindowCreated, WindowCloseRequested, WindowResized, CursorMoved};
 use bevy_app::AppExit;
 use bevy_ecs::Resources;
-use crate::sdl2_windows::Sdl2Windows;
-use bevy_input::keyboard::{KeyboardInput, ElementState};
+use bevy_input::keyboard::{ElementState, KeyboardInput};
+use bevy_input::mouse::{MouseButtonInput, MouseMotion};
 use bevy_math::prelude::*;
-use bevy_input::mouse::{MouseMotion, MouseButtonInput};
+use bevy_window::{
+    CreateWindow, CursorMoved, WindowCloseRequested, WindowCreated, WindowResized, Windows,
+};
 
 mod sdl2_windows;
 
@@ -15,9 +17,11 @@ mod sdl2_windows;
 pub struct Sdl2Plugin;
 
 impl Plugin for Sdl2Plugin {
-    fn build(&self, app: &mut AppBuilder) {
-        app
-            .set_runner(sdl2_runner);
+    fn build(
+        &self,
+        app: &mut AppBuilder,
+    ) {
+        app.set_runner(sdl2_runner);
     }
 }
 
@@ -43,11 +47,12 @@ pub fn sdl2_runner(mut app: App) {
         &mut app.resources,
         &video_subsystem,
         &mut sdl2_windows,
-        &mut create_window_event_reader
+        &mut create_window_event_reader,
     );
 
     // SDL2 has a lot of events we can support, expose them all via an event
-    app.resources.insert(Events::<sdl2::event::Event>::default());
+    app.resources
+        .insert(Events::<sdl2::event::Event>::default());
 
     log::debug!("Entering SDL2 event loop");
 
@@ -59,64 +64,53 @@ pub fn sdl2_runner(mut app: App) {
         }
 
         {
-            let mut sdl2_events = app.resources.get_mut::<Events<sdl2::event::Event>>().unwrap();
+            let mut sdl2_events = app
+                .resources
+                .get_mut::<Events<sdl2::event::Event>>()
+                .unwrap();
             for event in event_pump.poll_iter() {
                 match event {
                     sdl2::event::Event::Window {
                         window_id,
                         win_event,
                         ..
-                    } => {
-                        match win_event {
-                            sdl2::event::WindowEvent::Close => {
-                                let mut window_close_requested_events = app
-                                    .resources
-                                    .get_mut::<Events<WindowCloseRequested>>()
-                                    .unwrap();
-                                let window_id = sdl2_windows.get_window_id(window_id).unwrap();
-                                window_close_requested_events.send(WindowCloseRequested { id: window_id });
-                            },
-                            sdl2::event::WindowEvent::Resized(width, height) => {
-                                let mut windows = app.resources.get_mut::<Windows>().unwrap();
-                                let bevy_window_id = sdl2_windows.get_window_id(window_id).unwrap();
-                                let mut window = windows.get_mut(bevy_window_id).unwrap();
-                                window.width = width as u32;
-                                window.height = height as u32;
-
-                                let mut resize_events = app.resources.get_mut::<Events<WindowResized>>().unwrap();
-                                resize_events.send(WindowResized {
-                                    id: bevy_window_id,
-                                    height: window.height as usize,
-                                    width: window.width as usize,
-                                });
-                            }
-                            _ => {}
+                    } => match win_event {
+                        sdl2::event::WindowEvent::Close => {
+                            let mut window_close_requested_events = app
+                                .resources
+                                .get_mut::<Events<WindowCloseRequested>>()
+                                .unwrap();
+                            let window_id = sdl2_windows.get_window_id(window_id).unwrap();
+                            window_close_requested_events
+                                .send(WindowCloseRequested { id: window_id });
                         }
+                        sdl2::event::WindowEvent::Resized(width, height) => {
+                            let mut windows = app.resources.get_mut::<Windows>().unwrap();
+                            let bevy_window_id = sdl2_windows.get_window_id(window_id).unwrap();
+                            let mut window = windows.get_mut(bevy_window_id).unwrap();
+                            window.width = width as u32;
+                            window.height = height as u32;
+
+                            let mut resize_events =
+                                app.resources.get_mut::<Events<WindowResized>>().unwrap();
+                            resize_events.send(WindowResized {
+                                id: bevy_window_id,
+                                height: window.height as usize,
+                                width: window.width as usize,
+                            });
+                        }
+                        _ => {}
                     },
                     sdl2::event::Event::KeyDown {
-                        keycode,
-                        scancode,
-                        ..
+                        keycode, scancode, ..
                     } => {
-                        send_key_event(
-                            &app,
-                            keycode,
-                            scancode,
-                            ElementState::Pressed
-                        );
-                    },
+                        send_key_event(&app, keycode, scancode, ElementState::Pressed);
+                    }
                     sdl2::event::Event::KeyUp {
-                        keycode,
-                        scancode,
-                        ..
+                        keycode, scancode, ..
                     } => {
-                        send_key_event(
-                            &app,
-                            keycode,
-                            scancode,
-                            ElementState::Released
-                        );
-                    },
+                        send_key_event(&app, keycode, scancode, ElementState::Released);
+                    }
                     sdl2::event::Event::MouseMotion {
                         window_id,
                         x,
@@ -135,7 +129,7 @@ pub fn sdl2_runner(mut app: App) {
                         let y_position = height as i32 - y;
                         cursor_moved_events.send(CursorMoved {
                             id: bevy_window_id,
-                            position: Vec2::new(x as f32, y_position as f32)
+                            position: Vec2::new(x as f32, y_position as f32),
                         });
 
                         let mut mouse_motion_events =
@@ -143,19 +137,21 @@ pub fn sdl2_runner(mut app: App) {
                         mouse_motion_events.send(MouseMotion {
                             delta: Vec2::new(xrel as f32, yrel as f32),
                         });
-                    },
-                    sdl2::event::Event::MouseButtonDown {
-                        mouse_btn,
-                        ..
-                    } => {
-                        send_mouse_event(&app, mouse_btn, bevy_input::keyboard::ElementState::Pressed);
-                    },
-                    sdl2::event::Event::MouseButtonUp {
-                        mouse_btn,
-                        ..
-                    } => {
-                        send_mouse_event(&app, mouse_btn, bevy_input::keyboard::ElementState::Released);
-                    },
+                    }
+                    sdl2::event::Event::MouseButtonDown { mouse_btn, .. } => {
+                        send_mouse_event(
+                            &app,
+                            mouse_btn,
+                            bevy_input::keyboard::ElementState::Pressed,
+                        );
+                    }
+                    sdl2::event::Event::MouseButtonUp { mouse_btn, .. } => {
+                        send_mouse_event(
+                            &app,
+                            mouse_btn,
+                            bevy_input::keyboard::ElementState::Released,
+                        );
+                    }
                     _ => {}
                 }
 
@@ -167,7 +163,7 @@ pub fn sdl2_runner(mut app: App) {
             &mut app.resources,
             &video_subsystem,
             &mut sdl2_windows,
-            &mut create_window_event_reader
+            &mut create_window_event_reader,
         );
         app.update();
     }
@@ -179,8 +175,7 @@ fn send_key_event(
     scancode: Option<sdl2::keyboard::Scancode>,
     element_state: bevy_input::keyboard::ElementState,
 ) {
-    let mut keyboard_input_events =
-        app.resources.get_mut::<Events<KeyboardInput>>().unwrap();
+    let mut keyboard_input_events = app.resources.get_mut::<Events<KeyboardInput>>().unwrap();
 
     // These options are due to conversion from C types to i32.
     // - Keycode is typedeffed as i32
@@ -194,7 +189,7 @@ fn send_key_event(
     keyboard_input_events.send(converters::convert_keyboard_input(
         keycode,
         scancode,
-        element_state
+        element_state,
     ));
 }
 
