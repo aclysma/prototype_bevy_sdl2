@@ -1,5 +1,5 @@
 [package]
-name = "bevy_sdl2"
+name = "prototype_bevy_sdl2"
 version = "0.1.0"
 authors = ["Philip Degarmo <aclysma@gmail.com>"]
 edition = "2018"
@@ -25,14 +25,16 @@ log = { version = "0.4", features = ["release_max_level_info"] }
 [dev-dependencies]
 bevy = { git = "https://github.com/bevyengine/bevy.git", version = "0.1", default-features = false, features = ["bevy_wgpu"] }
 
+# Support for raw window
 [patch."https://github.com/bevyengine/bevy"]
-bevy = { path = "../bevy" }
-bevy_app = { path = "../bevy/crates/bevy_app" }
-bevy_ecs = { path = "../bevy/crates/bevy_ecs" }
-bevy_input = { path = "../bevy/crates/bevy_input" }
-bevy_math = { path = "../bevy/crates/bevy_math" }
-bevy_window = { path = "../bevy/crates/bevy_window" }
+bevy = { git = "https://github.com/aclysma/bevy", branch = "use-raw-window-handle" }
+bevy_app = { git = "https://github.com/aclysma/bevy", branch = "use-raw-window-handle" }
+bevy_ecs = { git = "https://github.com/aclysma/bevy", branch = "use-raw-window-handle" }
+bevy_input = { git = "https://github.com/aclysma/bevy", branch = "use-raw-window-handle" }
+bevy_math = { git = "https://github.com/aclysma/bevy", branch = "use-raw-window-handle" }
+bevy_window = { git = "https://github.com/aclysma/bevy", branch = "use-raw-window-handle" }
 
+# macOS fix for SDL2 in gfx-hal
 [patch.crates-io]
-gfx-backend-metal = { path = "../gfx/src/backend/metal" }
-gfx-hal = { path = "../gfx/src/hal" }
+gfx-backend-metal = { git = "https://github.com/aclysma/gfx.git", branch = "use-default-nsview-hal-0.5" }
+gfx-hal = { git = "https://github.com/aclysma/gfx.git", branch = "use-default-nsview-hal-0.5" }

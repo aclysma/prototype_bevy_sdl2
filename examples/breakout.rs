@@ -8,7 +8,7 @@ use bevy::{
 fn main() {
     App::build()
         .add_default_plugins()
-        .add_plugin(bevy_sdl2::Sdl2Plugin::default())
+        .add_plugin(prototype_bevy_sdl2::Sdl2Plugin::default())
         .add_resource(Scoreboard { score: 0 })
         .add_resource(ClearColor(Color::rgb(0.7, 0.7, 0.7)))
         .add_startup_system(setup.system())

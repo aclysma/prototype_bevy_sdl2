@@ -10,6 +10,6 @@ fn main() {
             vsync: true,
         })
         .add_default_plugins()
-        .add_plugin(bevy_sdl2::Sdl2Plugin::default())
+        .add_plugin(prototype_bevy_sdl2::Sdl2Plugin::default())
         .run();
 }
