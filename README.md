@@ -1,4 +1,4 @@
-# engine_prototype
+# prototype_bevy_sdl2
 
 This is a prototype SDL2 integration for bevy. It requires two upstream changes:
  * Support for raw-window-handle in bevy (https://github.com/aclysma/bevy/tree/use-raw-window-handle)
