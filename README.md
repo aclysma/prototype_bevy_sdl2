@@ -1,7 +1,7 @@
 # prototype_bevy_sdl2
 
-This is a prototype SDL2 integration for bevy. It requires two upstream changes:
- * Support for raw-window-handle in bevy (https://github.com/aclysma/bevy/tree/use-raw-window-handle)
+This is a prototype [SDL2](https://www.libsdl.org/) integration for Bevy. It requires two upstream changes:
+ * Support for raw-window-handle in Bevy (https://github.com/aclysma/bevy/tree/use-raw-window-handle)
  * A patch for macOS in gfx-hal (https://github.com/gfx-rs/gfx/issues/3329)
 
 ## Status
